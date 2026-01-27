@@ -1,3 +1,4 @@
+import { AppError } from "@/utils/AppError.js";
 import { NextFunction, Request, Response } from "express";
 
 class ProductController {
