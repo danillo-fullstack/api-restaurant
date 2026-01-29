@@ -6,7 +6,14 @@ import { z } from "zod";
 class ProductController {
   async index(request: Request, response: Response, next: NextFunction) {
     try {
-      return response.json({ message: "Ok" });
+      const { name } = request.query;
+
+      const products = await knexInstance<productRepository>("products")
+        .select()
+        .whereLike("name", `%${name ?? ""}%`)
+        .orderBy("name");
+
+      return response.json(products);
     } catch (error) {
       next(error);
     }
@@ -28,18 +35,28 @@ class ProductController {
     }
   }
 
-  async list(request: Request, response: Response, next: NextFunction) {
+  async update(request: Request, response: Response, next: NextFunction) {
     try {
-      const { name } = request.query;
+      const id = z.coerce
+        .number()
+        .int({ message: "id must be an integer" })
+        .positive({ message: "id must be greater than zero" })
+        .parse(request.params.id);
 
-      const products = await knexInstance<productRepository>("products")
-        .select()
-        .whereLike("name", `%${name ?? ""}%`)
-        .orderBy("name");
+      const bodySchema = z.object({
+        name: z.string().trim().min(6),
+        price: z.number().gt(0),
+      });
 
-      return response.json(products);
+      const { name, price } = bodySchema.parse(request.body);
+
+      await knexInstance<productRepository>("products")
+        .update({ name, price, updated_at: knexInstance.fn.now() })
+        .where({ id });
+
+      response.json();
     } catch (error) {
-      next: error;
+      next(error);
     }
   }
 }
