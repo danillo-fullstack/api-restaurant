@@ -50,11 +50,15 @@ class ProductController {
 
       const { name, price } = bodySchema.parse(request.body);
 
-      await knexInstance<productRepository>("products")
+      const rowsUpdated = await knexInstance<productRepository>("products")
         .update({ name, price, updated_at: knexInstance.fn.now() })
         .where({ id });
 
-      response.json();
+      if (!rowsUpdated) {
+        return response.status(404).json({ message: "Product not found." });
+      }
+
+      return response.status(204).send();
     } catch (error) {
       next(error);
     }
