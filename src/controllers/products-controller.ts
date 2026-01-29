@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { knexInstance } from "../database/knex.js";
 
 import { z } from "zod";
+import { AppError } from "@/utils/AppError.js";
 
 class ProductController {
   async index(request: Request, response: Response, next: NextFunction) {
@@ -56,6 +57,28 @@ class ProductController {
 
       if (!rowsUpdated) {
         return response.status(404).json({ message: "Product not found." });
+      }
+
+      return response.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async remove(request: Request, response: Response, next: NextFunction) {
+    try {
+      const id = z.coerce
+        .number()
+        .int({ message: "id must be an integer" })
+        .positive({ message: "id must be greater than zero" })
+        .parse(request.params.id);
+
+      const rowsDeleted = await knexInstance<productRepository>("products")
+        .where({ id })
+        .delete();
+
+      if (!rowsDeleted) {
+        throw new AppError("Product not found", 404);
       }
 
       return response.status(204).send();
