@@ -47,6 +47,34 @@ class TablesSessionsController {
       next(error);
     }
   }
+
+  async update(request: Request, response: Response, next: NextFunction) {
+    const id = z.coerce
+      .number()
+      .int({ message: "id must be an integer" })
+      .positive({ message: "id must be greater than zero" })
+      .parse(request.params.id);
+
+    const session = await knexInstance<TablesSessionsRepository>(
+      "tables_sessions",
+    )
+      .where({ id })
+      .first();
+
+    if (!session) {
+      throw new AppError("session table not found.");
+    }
+
+    if (session.closed_at) {
+      throw new AppError("this sessions table is already closed.");
+    }
+
+    await knexInstance<TablesSessionsRepository>("tables_sessions")
+      .update({ closed_at: knexInstance.fn.now() })
+      .where({ id });
+
+    return response.json();
+  }
 }
 
 export { TablesSessionsController };
