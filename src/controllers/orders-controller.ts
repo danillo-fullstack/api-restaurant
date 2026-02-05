@@ -39,6 +39,12 @@ class OrdersController {
         throw new AppError("this table is closed.", 409);
       }
 
+      await knexInstance<OrderRepository>("orders").insert({
+        table_session_id,
+        product_id,
+        quantity,
+        price: product.price,
+      });
       return response.status(201).json();
     } catch (error) {
       next(error);
