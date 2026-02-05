@@ -22,7 +22,7 @@ class OrdersController {
         .first();
 
       if (!product) {
-        throw new AppError("product not found.");
+        throw new AppError("product not found.", 404);
       }
 
       const session = await knexInstance<TablesSessionsRepository>(
@@ -32,11 +32,11 @@ class OrdersController {
         .first();
 
       if (!session) {
-        throw new AppError("session table not found.");
+        throw new AppError("session table not found.", 404);
       }
 
       if (session.closed_at) {
-        throw new AppError("this table is closed.");
+        throw new AppError("this table is closed.", 409);
       }
 
       return response.status(201).json();
