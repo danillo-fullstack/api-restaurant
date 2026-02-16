@@ -1,74 +1,149 @@
 # 🍽️ API Restaurant
 
-API REST desenvolvida para gerenciar mesas, sessões de atendimento e pedidos em um restaurante, com foco em organização de regras de negócio e validação de dados.
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-green)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![Express](https://img.shields.io/badge/Express-5.x-gray)](https://expressjs.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-3.x-003545?style=flat&logo=sqlite)](https://www.sqlite.org/)
 
-## 🚀 Objetivo
+API REST para gerenciamento de mesas, sessões e pedidos em restaurantes.
 
-Oferecer uma API RESTful moderna, eficiente e segura para digitalizar operações de restaurantes, facilitando o controle de pedidos, gerenciamento de mesas, produtos e sessões, com foco em performance, organização e facilidade de integração.
+## ✨ Funcionalidades
 
-## 🛠️ Tecnologias Utilizadas
+- **Produtos** — Cadastro e gerenciamento do cardápio
+- **Mesas** — Controle das mesas do restaurante
+- **Sessões** — Abertura e fechamento de sessões por mesa
+- **Pedidos** — Criação e acompanhamento de pedidos
 
-- **Node.js**
-- **TypeScript**
-- **Express.js**
-- **Knex.js** (Query Builder)
-- **SQLite** (pode ser adaptado para outros bancos)
-- **Migrations & Seeds** para versionamento e popularização do banco
+## 🚀 Como Executar
 
-## 📚 Principais Rotas
+### Pré-requisitos
+
+- Node.js 20.x ou superior
+- npm ou yarn
+
+### Instalação
+
+```bash
+# Clone o projeto
+git clone https://github.com/danillo-fullstack/api-restaurant.git
+cd api-restaurant
+
+# Instale as dependências
+npm install
+
+# Execute as migrations (cria as tabelas)
+npm run knex migrate:latest
+
+# Popule o banco com dados de exemplo
+npm run knex seed:run
+
+# Inicie o servidor
+npm run dev
+```
+
+Servidor rodando em: `http://localhost:3000`
+
+## 📦 Scripts Disponíveis
+
+| Script | Descrição |
+|--------|-----------|
+| `npm run dev` | Inicia o servidor em modo desenvolvimento |
+| `npm run knex migrate:latest` | Executa as migrations |
+| `npm run knex seed:run` | Popula o banco com dados de exemplo |
+
+## 🔗 Endpoints
 
 ### Produtos
 
-- `GET /products` — Lista todos os produtos
-- `GET /products/:id` — Detalha um produto
-- `POST /products` — Cria um novo produto
-- `PUT /products/:id` — Atualiza um produto
-- `DELETE /products/:id` — Remove um produto
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/products` | Lista todos os produtos |
+| GET | `/products/:id` | Detalha um produto |
+| POST | `/products` | Cria um novo produto |
+| PUT | `/products/:id` | Atualiza um produto |
+| DELETE | `/products/:id` | Remove um produto |
+
+**Exemplo - Criar produto:**
+```json
+POST /products
+{
+  "name": "Hambúrguer Artesanal",
+  "price": 29.90,
+  "category": "lanches"
+}
+```
 
 ### Mesas
 
-- `GET /tables` — Lista todas as mesas
-- `GET /tables/:id` — Detalha uma mesa
-- `POST /tables` — Cria uma nova mesa
-- `PUT /tables/:id` — Atualiza uma mesa
-- `DELETE /tables/:id` — Remove uma mesa
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/tables` | Lista todas as mesas |
+| GET | `/tables/:id` | Detalha uma mesa |
+| POST | `/tables` | Cria uma nova mesa |
+| PUT | `/tables/:id` | Atualiza uma mesa |
+| DELETE | `/tables/:id` | Remove uma mesa |
 
-### Sessões de Mesas
+### Sessões de Mesa
 
-- `GET /tables-sessions` — Lista sessões de mesas
-- `POST /tables-sessions` — Inicia uma sessão em uma mesa
-- `PATCH /tables-sessions/:id/close` — Encerra uma sessão
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/tables-sessions` | Lista sessões ativas |
+| POST | `/tables-sessions` | Abre uma sessão na mesa |
+| PATCH | `/tables-sessions/:id/close` | Encerra uma sessão |
+
+**Exemplo - Abrir sessão:**
+```json
+POST /tables-sessions
+{
+  "tableId": 1
+}
+```
 
 ### Pedidos
 
-- `GET /orders` — Lista todos os pedidos
-- `GET /orders/:id` — Detalha um pedido
-- `POST /orders` — Cria um novo pedido
-- `PATCH /orders/:id/status` — Atualiza status do pedido
-- `DELETE /orders/:id` — Remove um pedido
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/orders` | Lista todos os pedidos |
+| GET | `/orders/:id` | Detalha um pedido |
+| POST | `/orders` | Cria um novo pedido |
+| PATCH | `/orders/:id/status` | Atualiza status do pedido |
+| DELETE | `/orders/:id` | Remove um pedido |
 
-## 💡 Diferenciais
+**Exemplo - Criar pedido:**
+```json
+POST /orders
+{
+  "tableSessionId": 1,
+  "products": [
+    { "productId": 1, "quantity": 2 },
+    { "productId": 3, "quantity": 1 }
+  ]
+}
+```
 
-- Estrutura modular e escalável
-- Tratamento centralizado de erros
-- Migrations e seeds para fácil setup
-- Código limpo e orientado a boas práticas
+## 📂 Estrutura do Projeto
+
+```
+src/
+├── controllers/      # Lógica de negócio (ação do endpoint)
+├── database/         # Migrations, seeds e configuração do Knex
+├── middlewares/     # Middlewares (tratamento de erros)
+├── routes/          # Definição das rotas
+├── utils/           # Classes utilitárias (erros personalizados)
+└── server.ts        # Ponto de entrada da aplicação
+```
+
+## 🛠️ Tecnologias
+
+- **Node.js** — Runtime JavaScript
+- **TypeScript** — Superset tipado
+- **Express** — Framework web
+- **Knex.js** — Query builder
+- **SQLite** — Banco de dados
+- **Zod** — Validação de dados
 
 ---
 
-## 📝 Como testar o projeto
+## 📄 Licença
 
-1. **Clone o repositório:**
-
-   ```bash
-   git clone <URL_DO_SEU_REPOSITORIO>
-   cd api-restaurant
-   ```
-
-2. **Importe o arquivo de requisições:**
-   - Importe o arquivo `request_insomnia.json` no Insomnia para testar todas as rotas rapidamente.
-
-3. **Banco de dados:**
-   - O projeto utiliza **SQLite** por padrão, facilitando o setup e testes locais. O banco é criado e populado automaticamente via migrations e seeds.
-
-
+ISC — Danillo Caetano
